@@ -9,6 +9,7 @@ import           Data.Maybe                     (fromMaybe)
 import qualified Data.Domain.CalendarEntry      as Domain
 import           Presentation.Dto.CalendarEntry
 import           Presentation.Mapper.BaseMapper
+import Data.IxSet (empty)
 
 instance Mapper Domain.CalendarEntry CalendarEntry where
     transformToDto domain =
@@ -29,7 +30,7 @@ instance Mapper Domain.CalendarEntry CalendarEntry where
                     , Domain.version = 0
                     , Domain.title = title dto
                     , Domain.description = description dto
-                    , Domain.tasks = []
+                    , Domain.tasks = empty
                     , Domain.startDate = startDate dto
                     , Domain.endDate = endDate dto
                     }

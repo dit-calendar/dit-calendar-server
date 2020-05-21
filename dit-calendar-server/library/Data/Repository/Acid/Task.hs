@@ -7,16 +7,11 @@ module Data.Repository.Acid.Task
     GetTaskList(..), UpdateTask(..), DeleteTask(..) ) where
 
 import           Data.Acid                          (Query, Update, makeAcidic)
-import           Data.IxSet                         (Indexable (..), ixFun,
-                                                     ixSet)
 
 import           Data.Domain.Task                   (Task (..))
 import           Data.Domain.Types                  (EitherResult, TaskId)
 
 import qualified Data.Repository.Acid.InterfaceAcid as InterfaceAcid
-
-instance Indexable Task where
-  empty = ixSet [ ixFun $ \bp -> [ taskId bp ] ]
 
 type TaskList = InterfaceAcid.EntrySet Task
 

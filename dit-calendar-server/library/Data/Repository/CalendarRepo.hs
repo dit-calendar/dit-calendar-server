@@ -17,7 +17,7 @@ module Data.Repository.CalendarRepo
 
 import           Control.Monad.IO.Class             (MonadIO)
 import           Data.Default                       (def)
-import qualified Data.List                          as List
+import qualified Data.IxSet as IxSet
 import           Data.Maybe                         (fromJust)
 import           Data.Time.Clock                    (UTCTime)
 
@@ -28,6 +28,7 @@ import           Data.Domain.Types                  (Description, EitherResult,
                                                      EntryId, TaskId)
 import           Data.Domain.User                   as User
 import           Data.Domain.User                   (User)
+import Data.Domain.Task (Task)
 import           Data.Repository.Acid.CalendarEntry (CalendarDAO (..))
 import           Data.Repository.PermissionControl  (executeUnderUserPermission)
 import           Server.AcidInitializer
@@ -63,12 +64,12 @@ updateCalendarImpl calendarEntry = executeUnderUserPermission
 findCalendarByIdImpl :: (CalendarDAO m, MonadIO m) => EntryId -> m (Maybe CalendarEntry)
 findCalendarByIdImpl = query . CalendarEntryAcid.EntryById
 
-deleteTaskFromCalendarEntryImpl :: (CalendarDAO m, AppContext m ) => CalendarEntry -> Int -> m (EitherResult CalendarEntry)
+deleteTaskFromCalendarEntryImpl :: (CalendarDAO m, AppContext m ) => CalendarEntry -> TaskId -> m (EitherResult CalendarEntry)
 deleteTaskFromCalendarEntryImpl calendarEntry taskId =
-    updateCalendarImpl calendarEntry {tasks = List.delete taskId (tasks calendarEntry)}
+    updateCalendarImpl calendarEntry {tasks = IxSet.deleteIx taskId (tasks calendarEntry)}
 
-addTaskToCalendarEntryImpl :: (CalendarDAO m, AppContext m ) => CalendarEntry -> TaskId -> m (EitherResult CalendarEntry)
-addTaskToCalendarEntryImpl calendarEntry taskId = updateCalendarImpl calendarEntry {tasks = taskId : tasks calendarEntry}
+addTaskToCalendarEntryImpl :: (CalendarDAO m, AppContext m ) => CalendarEntry -> Task -> m (EitherResult CalendarEntry)
+addTaskToCalendarEntryImpl calendarEntry task = updateCalendarImpl calendarEntry {tasks = IxSet.insert task (tasks calendarEntry)}
 
 class Monad m => MonadDBCalendarRepo m where
     createCalendarEntry :: CalendarEntry -> m CalendarEntry
@@ -78,7 +79,7 @@ class Monad m => MonadDBCalendarRepo m where
     updateCalendar :: CalendarEntry -> m (EitherResult CalendarEntry)
     deleteCalendarEntry :: CalendarEntry -> m ()
     deleteTaskFromCalendarEntry :: CalendarEntry -> Int -> m (EitherResult CalendarEntry)
-    addTaskToCalendarEntry :: CalendarEntry -> TaskId -> m (EitherResult CalendarEntry)
+    addTaskToCalendarEntry :: CalendarEntry -> Task -> m (EitherResult CalendarEntry)
 
 instance CalendarDAO App => MonadDBCalendarRepo App where
     createCalendarEntry = createCalendarEntryImpl

@@ -6,10 +6,15 @@ module Data.Domain.Task where
 
 import           Data.Data         (Data, Typeable)
 import           Data.Default
-import           Data.Domain.Types (Description, Entity (..), TaskId,
-                                    TelegramChatId, Title, UserId)
+import           Data.IxSet        (Indexable (..), ixFun, ixSet)
 import           Data.SafeCopy     (base, deriveSafeCopy)
 import           Data.Time.Clock   (UTCTime)
+
+import           Data.Domain.Types (Description, Entity (..), TaskId,
+                                    TelegramChatId, Title, UserId)
+
+instance Indexable Task where
+  empty = ixSet [ ixFun $ \bp -> [ taskId bp ] ]
 
 data Task = Task {
     title                   :: Title

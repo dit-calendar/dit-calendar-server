@@ -8,9 +8,9 @@ module Data.Repository.Acid.CalendarEntry
 
 import           Control.Monad.Reader               (asks)
 import           Data.Acid                          (Query, Update, makeAcidic)
-import           Data.IxSet                         (Indexable (..), Proxy (..),
-                                                     getEQ, getRange, ixFun,
-                                                     ixSet, toDescList, toList)
+import           Data.IxSet                         (Proxy (..), getEQ,
+                                                     getRange, toDescList,
+                                                     toList)
 
 import           Data.Domain.CalendarEntry          (CalendarEntry (..))
 import           Data.Domain.Types                  (EitherResult, EntryId,
@@ -20,13 +20,6 @@ import           Data.Domain.Types                  (EitherResult, EntryId,
 import qualified Data.Domain.User                   as User
 import qualified Data.Repository.Acid.InterfaceAcid as InterfaceAcid
 
-
-instance Indexable CalendarEntry where
-  empty = ixSet [ ixFun $ \bp -> [ entryId bp ]
-                , ixFun $ \bp -> [ UserIdIndex $ owner bp ]
-                , ixFun $ \bp -> [ startDate bp]
-                , ixFun $ \bp -> [ endDate bp]
-                ]
 
 type EntryList = InterfaceAcid.EntrySet CalendarEntry
 
