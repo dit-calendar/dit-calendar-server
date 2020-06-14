@@ -1,2 +1,12 @@
+.cabal-sandbox/
+cabal.sandbox.config
+dist/
+state/
+_state/
+dit-calendar.iml
 .idea/
+ideaHaskellLib
 .directory
+.stack-work
+out/
+stack.yaml.lock
