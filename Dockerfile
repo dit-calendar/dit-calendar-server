@@ -5,7 +5,7 @@ WORKDIR /build
 
 # Docker build should not use cached layer if any of these is modified
 RUN apt-get update && apt-get -y install happy
-COPY stack.yaml stack.yaml.lock dit-calendar-server.cabal /build/
+COPY stack.yaml dit-calendar-server.cabal /build/
 RUN stack build --dependencies-only
 
 # build image
@@ -23,7 +23,7 @@ COPY library /build/library
 COPY src /build/src
 COPY testsuite /build/testsuite
 COPY LICENSE /build/
-COPY stack.yaml stack.yaml.lock dit-calendar-server.cabal /build/
+COPY stack.yaml dit-calendar-server.cabal /build/
 
 RUN apt-get update && apt-get -y install happy
 RUN stack build
