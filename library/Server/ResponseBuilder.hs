@@ -93,7 +93,7 @@ corsResponse corsConfig =
 addCorsHeaders :: CorsConfig ->  Response -> Response
 addCorsHeaders corsConfig response =
     setHeader "Access-Control-Allow-Methods" "POST, GET, PUT, DELETE, OPTIONS" $
-    setHeader "Access-Control-Allow-Headers" "Content-Type" $
+    setHeader "Access-Control-Allow-Headers" "Content-Type, Authorization" $
     setHeader "Access-Control-Allow-Origin" (corsConfigAllowOrigin corsConfig) $
     setHeader "Access-Control-Allow-Credentials" (map toLower (show $ corsConfigAllowCredentials corsConfig)) response
 
