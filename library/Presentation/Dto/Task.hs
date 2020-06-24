@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-missing-fields #-}
 
 module Presentation.Dto.Task
-    ( Task(..), validate ) where
+    ( Task(..), validate, validateList ) where
 
 import           Prelude           hiding (null)
 
@@ -34,6 +34,10 @@ validate (Right task) =
         then Right task
         else Left "startTime cannot be before endTime"
     else Left "title cannot be empty"
+
+validateList :: Either String [Task] -> Either String [Task]
+validateList (Left e) = Left e
+validateList (Right  tasks) = mapM (validate . Right) tasks
 
 instance ToJSON Task where
     toEncoding = genericToEncoding defaultOptions { omitNothingFields = True }

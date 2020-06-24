@@ -13,8 +13,7 @@ import           Auth.Authorization                             (callIfAuthorize
 import           Data.Domain.Types                              (EntryId,
                                                                  TaskId,
                                                                  TelegramChatId)
-import           Presentation.Dto.Task                          as TaskDto (Task (..),
-                                                                            validate)
+import           Presentation.Dto.Task                          as TaskDto
 import           Presentation.Dto.TelegramUserLink              as TelegramDto (TelegramUserLink (..),
                                                                                 validate)
 import           Server.HttpServerHelper                        (getBody,
@@ -33,8 +32,8 @@ routeTask entryId = do
     case m of
         POST -> do
             body <- getBody
-            case TaskDto.validate (eitherDecode body :: Either String TaskDto.Task) of
-                 Right taskDto -> callIfAuthorized (TaskController.createTask entryId taskDto)
+            case TaskDto.validateList (eitherDecode body :: Either String [TaskDto.Task]) of
+                 Right taskDtos -> callIfAuthorized (TaskController.createTasks entryId taskDtos)
                  Left errorMessage -> badRequest errorMessage
         GET -> callIfAuthorized (TaskController.calendarTasks entryId)
         other -> notImplemented other

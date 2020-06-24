@@ -35,15 +35,21 @@ createTaskInCalendarImpl calendarEntry task = do
     return mTask
     where newTaskWithUser = task {Task.owner = CalendarEntry.owner calendarEntry }
 
+createTasksInCalendarImpl :: (MonadDBTaskRepo m, MonadDBCalendarRepo m) =>
+            CalendarEntry -> [Task] -> m [Task]
+createTasksInCalendarImpl calendarEntry = mapM (createTaskInCalendarImpl calendarEntry)
+
 updateTaskInCalendarImpl :: MonadDBTaskRepo m => Task -> m (EitherResult Task)
 updateTaskInCalendarImpl = TaskRepo.updateTask
 
 class Monad m => TaskService m where
     deleteTaskAndCascade :: CalendarEntry -> Task -> m ()
     createTaskInCalendar :: CalendarEntry -> Task -> m Task
+    createTasksInCalendar :: CalendarEntry -> [Task] -> m [Task]
     updateTaskInCalendar :: Task -> m (EitherResult Task)
 
 instance (MonadDBTaskRepo App, MonadDBCalendarRepo App) => TaskService App where
     deleteTaskAndCascade = deleteTaskAndCascadeImpl
     createTaskInCalendar = createTaskInCalendarImpl
+    createTasksInCalendar = createTasksInCalendarImpl
     updateTaskInCalendar = updateTaskInCalendarImpl
