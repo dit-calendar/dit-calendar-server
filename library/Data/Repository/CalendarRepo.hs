@@ -41,6 +41,7 @@ instance CalendarDAO App where
     query = Foundation.query
     findList = Foundation.query
     findListForRange = Foundation.query
+    addTask = Foundation.update
 
 findAllCalendarEntriesImpl :: (CalendarDAO m, MonadIO m) => User -> m [CalendarEntry]
 findAllCalendarEntriesImpl = findList . CalendarEntryAcid.AllEntriesForUser
@@ -67,7 +68,8 @@ deleteTaskFromCalendarEntryImpl calendarEntry taskId =
     updateCalendarImpl calendarEntry {tasks = List.delete taskId (tasks calendarEntry)}
 
 addTaskToCalendarEntryImpl :: (CalendarDAO m, AppContext m ) => CalendarEntry -> TaskId -> m (EitherResult CalendarEntry)
-addTaskToCalendarEntryImpl calendarEntry taskId = updateCalendarImpl calendarEntry {tasks = taskId : tasks calendarEntry}
+addTaskToCalendarEntryImpl calendarEntry taskId = executeUnderUserPermission
+    calendarEntry (addTask  $ CalendarEntryAcid.AddTaskToEntry (entryId calendarEntry) taskId)
 
 class Monad m => MonadDBCalendarRepo m where
     createCalendarEntry :: CalendarEntry -> m CalendarEntry

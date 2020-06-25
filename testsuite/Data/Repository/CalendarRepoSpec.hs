@@ -21,6 +21,7 @@ import           AppContext                         (AppContext)
 import           Data.Domain.CalendarEntry          as CalendarEntry
 import           Data.Domain.User                   as User
 import           Data.Repository.Acid.CalendarEntry (CalendarDAO,
+                                                     AddTaskToEntry(..),
                                                      DeleteEntry (..),
                                                      NewEntry (..),
                                                      UpdateEntry (..))
@@ -35,6 +36,8 @@ newDate = read "2012-11-19 17:51:42.203841 UTC"::UTCTime
 mkFixture "Fixture" [ts| CalendarDAO, AppContext |]
 
 user = def { loginName="Foo", User.userId=10 }
+calcFromDB = def{ CalendarEntry.title = "A", description=Just "termin2", entryId=1, CalendarEntry.owner=10, tasks=[1],
+            startDate=oldDate, endDate=oldDate}
 
 fixture :: (Monad m, MonadWriter [String] m) => Fixture m
 fixture = Fixture { _create = \(NewEntry caledarEntry) -> return caledarEntry
@@ -42,6 +45,7 @@ fixture = Fixture { _create = \(NewEntry caledarEntry) -> return caledarEntry
                   , _update = \(UpdateEntry a)-> tell [show a] >>= (\_ -> return $ Right a)
                   ,_query = undefined
                   , _getCurrentUser = return $ Just user
+                  , _addTask = \(AddTaskToEntry cId tId) -> tell [show cId] >> tell [show tId] >>= (\_ -> return $ Right calcFromDB {tasks = tId : tasks calcFromDB})
                 }
 
 spec = describe "CalendarRepo" $ do
@@ -66,11 +70,14 @@ spec = describe "CalendarRepo" $ do
             Left _ -> assertFailure "updated calendar should be returned"
             Right r -> assertEqual "updated calendar should be returned" r calc
     it "addTaskToCalendarEntry" $ do
-        let calc = def{ CalendarEntry.title = "A", description=Just "termin2", entryId=1, CalendarEntry.owner=10, tasks=[1],
-            startDate=oldDate, endDate=oldDate}
-        let (_, log) = evalTestFixture (CalendarRepo.addTaskToCalendarEntryImpl calc 2) fixture
-        let newCalc = calc {tasks = [2, 1]}
-        log!!0 `shouldBe` show newCalc
+        let (result, log) = evalTestFixture (CalendarRepo.addTaskToCalendarEntryImpl calcFromDB 2) fixture
+        let newCalc = calcFromDB {tasks = [2, 1]}
+        length log `shouldBe` 2
+        log!!0 `shouldBe` show (entryId newCalc)
+        log!!0 `shouldBe` show 1
+        case result of
+            Left _ -> assertFailure "updated calendar should be returned"
+            Right r -> assertEqual "updated calendar should be returned" r newCalc
     it "deleteTaskFromCalendarEntry" $ do
         let calc = def{ CalendarEntry.title = "A", description=Just "termin2", entryId=1, CalendarEntry.owner=10, tasks=[1,2,3],
             startDate=oldDate, endDate=oldDate}
