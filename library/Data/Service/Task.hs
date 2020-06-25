@@ -4,7 +4,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Data.Service.Task
-    ( deleteTaskAndCascadeImpl, createTaskInCalendarImpl, updateTaskInCalendarImpl, TaskService(..) ) where
+    ( createTasksInCalendarImpl, deleteTaskAndCascadeImpl, createTaskInCalendarImpl, updateTaskInCalendarImpl, TaskService(..) ) where
 
 import           Control.Monad.IO.Class
 
