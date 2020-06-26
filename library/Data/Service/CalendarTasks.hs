@@ -39,9 +39,13 @@ updateCalendarAndTasksImpl calendarEntry = do
     if startDate (fromJust dbEntry) == startDate calendarEntry
     then CalendarRepo.updateCalendar calendarEntry
     else do
-        let dayyDiff = diffDays (utctDay $ startDate calendarEntry) (utctDay $ startDate $ fromJust dbEntry)
-        updateTasksOfCalendar calendarEntry dayyDiff
-        CalendarRepo.updateCalendar calendarEntry
+        response <- CalendarRepo.updateCalendar calendarEntry
+        case response of
+            Left _ -> return response
+            Right _ -> let daysDiff = diffDays (utctDay $ startDate calendarEntry) (utctDay $ startDate $ fromJust dbEntry) in
+                        do
+                            updateTasksOfCalendar calendarEntry daysDiff
+                            return response
 
 updateTasksOfCalendar :: (MonadDBTaskRepo m, TaskService.TaskService m) => CalendarEntry -> Integer -> m ()
 updateTasksOfCalendar calendarEntry dayDiff =
