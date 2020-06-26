@@ -12,6 +12,7 @@ import           Control.Monad.TestFixture
 import           Control.Monad.TestFixture.TH
 import           Data.Default                         (def)
 import           Test.Hspec
+import           Test.HUnit (assertEqual)
 
 import           Control.Monad.Identity               (Identity)
 import           Control.Monad.IO.Class
@@ -28,9 +29,11 @@ import           Data.Service.TelegramTasks (TelegramTasksAssignmentService)
 import qualified Data.Service.Task                    as TaskService
 
 
+dbDateTaskStart = read "2011-11-19 20:00:00.000000 UTC"::UTCTime
+dbDateTaskEnd = read "2011-11-20 10:00:00.000000 UTC"::UTCTime
 mkFixture "Fixture" [ts| TelegramTasksAssignmentService, MonadDBTaskRepo, MonadDBCalendarRepo |]
 dbDate = read "2011-11-19 18:28:52.607875 UTC"::UTCTime
-taskFromDb = def{ Task.title="A", Task.description=Just "task1", taskId=5, startTime=Nothing, endTime=Nothing, Task.owner=10}
+taskFromDb = def{ Task.title="A", Task.description=Just "task1", taskId=5, startTime=Just dbDateTaskStart, endTime=Just dbDateTaskEnd, Task.owner=10}
 entryFromDb = def { CalendarEntry.title="A", CalendarEntry.description=Just "termin2", entryId=1, CalendarEntry.owner=10,
         CalendarEntry.startDate=dbDate, CalendarEntry.endDate=dbDate,
         CalendarEntry.tasks = [1, 2]}
@@ -87,3 +90,8 @@ spec = describe "TaskServiceSpec" $ do
         log!!3 `shouldBe` show newTask2 {Task.owner = CalendarEntry.owner calc}
         log!!4 `shouldBe` show calc
         log!!5 `shouldBe` show (Task.taskId newTask2)
+    it "updateTasksDay" $ do
+        let (_, log) = evalTestFixture (TaskService.updateTasksDayImpl taskFromDb 62) fixture
+        let updateTask = taskFromDb {startTime=Just (read "2012-01-20 20:00:00.000000 UTC"::UTCTime), endTime=Just (read "2012-01-21 10:00:00.000000 UTC"::UTCTime)}
+        length log `shouldBe` 1
+        assertEqual "Nach falscher TelegramLink-Id gesucht" (show updateTask) (head log)

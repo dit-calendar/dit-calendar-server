@@ -13,6 +13,7 @@ import           Server.ResponseBuilder                  (onEntryExist,
 import qualified Data.Domain.User                        as DomainUser
 import qualified Data.Repository.CalendarRepo            as CalendarRepo
 import qualified Data.Service.CalendarEntry              as CalendarService
+import qualified Data.Service.CalendarTasks              as CalendarTasks
 import qualified Presentation.Dto.CalendarEntry          as CalendarDto
 import qualified Presentation.Dto.CalendarFilter         as FilterDto
 
@@ -45,7 +46,7 @@ updateCalendarEntry :: EntryId -> CalendarDto.CalendarEntry -> DomainUser.User -
 updateCalendarEntry entryId calendarDto loggedUser = onEntryExist entryId updateCalendar
   where
     updateCalendar cEntry = do
-        result <- CalendarRepo.updateCalendar (transformFromDto calendarDto $ Just cEntry)
+        result <- CalendarTasks.updateCalendarAndTasks (transformFromDto calendarDto $ Just cEntry)
         return $ transformToDtoE result
 
 
