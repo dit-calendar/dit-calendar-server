@@ -1,5 +1,11 @@
 # Revision history for dit-calendar
 
+## 0.7.0.0 -- 2020-06-26
+* split up repos
+* update ghci
+* endpoint for saving list of tasks
+* update date of calendar tasks if calendar is updated
+
 ## 0.6.0.0 -- 2020-06-01
 * create telegram bot
   * written in kotlin with kt-telegram-bot lib
