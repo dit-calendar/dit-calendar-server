@@ -33,7 +33,7 @@ instance Mapper Domain.Task Task where
                     , Domain.description = description dto
                     , Domain.taskId = 0
                     , Domain.version = 0
-                    , Domain.assignedTelegramLinks = assignedUsers dto
+                    , Domain.assignedTelegramLinks = []
                     , Domain.startTime = startTime dto
                     , Domain.endTime = endTime dto
                     }
@@ -44,7 +44,7 @@ instance Mapper Domain.Task Task where
                     , Domain.taskId = Domain.taskId dbTask
                     , Domain.version = fromMaybe (-1) (version dto)
                     , Domain.owner = Domain.owner dbTask
-                    , Domain.assignedTelegramLinks = assignedUsers dto
+                    , Domain.assignedTelegramLinks = Domain.assignedTelegramLinks dbTask
                     , Domain.startTime = startTime dto `orElse` Domain.startTime dbTask
                     , Domain.endTime = endTime dto `orElse` Domain.endTime dbTask
                     }
