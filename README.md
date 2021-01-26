@@ -1,4 +1,4 @@
-# dit-calendar [![Build Status](https://travis-ci.org/dit-calendar/dit-calendar-server.svg?branch=master)](https://travis-ci.org/dit-calendar/dit-calendar-server)
+# dit-calendar [![Build Status](https://travis-ci.com/dit-calendar/dit-calendar-server.svg?branch=master)](https://travis-ci.com/dit-calendar/dit-calendar-server)
 
 # Build
 
